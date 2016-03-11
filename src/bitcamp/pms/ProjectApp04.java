@@ -1,112 +1,55 @@
 /* 목표
-- 각 명령어(add,update,list,delete,quit,기타)를 처리하는 코드를
-  별도의 메서드로 분리하라.
+- 프로젝트 정보를 등록, 목록조회, 변경, 삭제하는 기능을 추가한다.
 - 사용 문법:
-  => 메서드 정의 및 호출 --> 재사용할 수 있는 코드로 만들자!
+  => 클래스 정의
+  => 여러 클래스의 인스턴스를 다루는 방법
 
-* Refectoring
-- 유지보수가 용이한 구조로 개편하는 것.
-예) 주석을 달아야 하는 로직을 메서드로 분리하여 코드 해석을 쉽게 만드는 행위.
-   => extract method
-   => 이 외에도 100가지 이상의 기법이 있다.
-
-1) prompt() 메서드 정의
-2) quit 명령을 처리하는 코드를 메서드로 분리. => doQuit() 정의
-3) 기타 명령에 대해 오류를 출력하는 코드를 분리 => doError() 정의
-4) add 명령을 처리하는 코드 분리 => doAdd() 정의
-5) update 명령을 처리하는 코드 분리 => doUpdate() 정의
+1) 멤버관리와 프로젝트 관리를 선택할 수 있는 메뉴 기능을 추가한다.
+- 기존에 동작하던 add, list, update, delete 명령을 막아라!
+명령> go member
+회원관리>      <--- 프롬프트 아니다. 그냥 출력하라.
+명령> go project
+프로젝트관리>    <--- 프롬프트 아니다. 그냥 출력하라.
+2) go 명령어의 옵션을 처리하는 기능을 추가한다.
+3) 명령어 처리 부분을 별도의 메서드로 분리한다.
+  => processCommand() 메서드 추가
+4) member 관련 명령 처리는 MemberController에게 맡긴다.
+  => MemberController에 명령어 처리 기능을 추가한다.
+     -> service() 메서드 추가
 */
 package bitcamp.pms;
 
 import java.util.Scanner;
-import bitcamp.pms.domain.Member;
+import bitcamp.pms.controller.MemberController;
 
 public class ProjectApp {
   static Scanner keyScan = new Scanner(System.in);
-  static Member[] members = new Member[1000];
-  static int count = 0;
+  static MemberController memberController = new MemberController();
 
   public static void main(String[] args) {
+    memberController.setScanner(keyScan); // <-- 의존 객체 주입
 
-    Member member = null;
     String input;
-    int no = 0;
-
-    while (true) {
+    do {
       input = prompt();
+      processCommand(input);
+    } while (!input.equals("quit"));
 
-      if (input.equals("quit")) {
-        doQuit();
-        break;
-      } else if (input.equals("add")) {
-        doAdd();
-      } else if (input.equals("update")) {
-        System.out.print("변경할 회원 번호는? ");
-        no = Integer.parseInt(keyScan.nextLine());
-
-        member = new Member();
-
-        System.out.printf("이름(%s)? ", members[no].getName());
-        member.setName(keyScan.nextLine());
-
-        System.out.printf("이메일(%s)? ", members[no].getEmail());
-        member.setEmail(keyScan.nextLine());
-
-        System.out.printf("암호(%s)? ", members[no].getPassword());
-        member.setPassword(keyScan.nextLine());
-
-        System.out.printf("전화(%s)? ", members[no].getTel());
-        member.setTel(keyScan.nextLine());
-
-        if (confirm("변경하시겠습니까?", true)) {
-          members[no] = member;
-          System.out.println("변경하였습니다.");
-        } else {
-          System.out.println("변경을 취소하였습니다.");
-        }
-      } else if (input.equals("list")) {
-        for (int i = 0; i < count; i++) {
-          System.out.printf("%d, %s\n", i,
-            (members[i] != null)?members[i].toString():"");
-        }
-
-      } else if (input.equals("delete")) {
-        System.out.print("삭제할 회원 번호는? ");
-        no = Integer.parseInt(keyScan.nextLine());
-        if (confirm("정말 삭제하시겠습니까?", true)) {
-          members[no] = null;
-          for (int i = no + 1; i < count; i++) {
-            members[i-1] = members[i];
-          }
-          count--;
-          System.out.println("삭제하였습니다.");
-        } else {
-          System.out.println("삭제를 취소하였습니다.");
-        }
-
-      } else {
-        doError();
-      }
-    }
+    keyScan.close(); // 항상 다 쓴 자원은 해제해야 한다.
   }
 
-  static boolean confirm(String message, boolean strictMode) {
-    String input = null;
-    do {
-      System.out.printf("%s(y/n) ", message);
-      input = keyScan.nextLine().toLowerCase();
+  static void processCommand(String input) {
+    String[] cmds = input.split(" ");
 
-      if (input.equals("y")) {
-        return true;
-      } else if (input.equals("n")) {
-        return false;
-      } else {
-        if (!strictMode) {
-          return false;
-        }
-        System.out.println("잘못된 명령어입니다.");
-      }
-    } while(true);
+    if (cmds[0].equals("quit")) {
+      doQuit();
+    } else if (cmds[0].equals("about")) {
+      doAbout();
+    } else if (cmds[0].equals("go")) {
+      doGo(cmds);
+    } else {
+      doError();
+    }
   }
 
   static String prompt() {
@@ -122,26 +65,27 @@ public class ProjectApp {
     System.out.println("올바르지 않은 명령어입니다.");
   }
 
-  static void doAdd() {
-    Member member = new Member();
+  static void doAbout() {
+    System.out.println("비트캠프 80기 프로젝트 관리 시스템!");
+  }
 
-    System.out.print("이름? ");
-    member.setName(keyScan.nextLine());
-
-    System.out.print("이메일? ");
-    member.setEmail(keyScan.nextLine());
-
-    System.out.print("암호? ");
-    member.setPassword(keyScan.nextLine());
-
-    System.out.print("전화? ");
-    member.setTel(keyScan.nextLine());
-
-    if (confirm("저장하시겠습니까?", true)) {
-      members[count++] = member;
-      System.out.println("저장하였습니다.");
-    } else {
-      System.out.println("저장을 취소하였습니다.");
+  static void doGo(String[] cmds) {
+    if (cmds.length < 2) {
+      System.out.println("메뉴 이름을 지정하세요.");
+      System.out.println("예) go member");
+      return ;
     }
+
+    switch (cmds[1]) {
+      case "member":
+        memberController.service();
+        break;
+      case "project":
+        System.out.println("프로젝트관리>");
+        break;
+      default:
+        System.out.println("없는 메뉴입니다.");
+    }
+
   }
 }
