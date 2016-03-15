@@ -2,17 +2,42 @@ package bitcamp.pms.controller;
 
 import java.util.Scanner;
 import bitcamp.pms.domain.Member;
+import bitcamp.pms.util.LinkedList;
 
 public class MemberController {
   private Scanner keyScan;
-  private Member[] members = new Member[1000];
-  private int count = 0;
+  private LinkedList members;
+
+  public MemberController() {
+    members = new LinkedList();
+  }
 
   public void setScanner(Scanner keyScan) {
     this.keyScan = keyScan;
   }
 
-  public void doAdd() {
+  public void service() {
+    String input = null;
+    do {
+      input = prompt();
+      switch (input) {
+        case "add": doAdd(); break;
+        case "list": doList(); break;
+        case "update": doUpdate(); break;
+        case "delete": doDelete(); break;
+        case "main": break;
+        default:
+          System.out.println("지원하지 않는 명령어입니다.");
+      }
+    } while (!input.equals("main"));
+  }
+
+  private String prompt() {
+    System.out.print("회원관리> ");
+    return keyScan.nextLine().toLowerCase();
+  }
+
+  private void doAdd() {
     Member member = new Member();
 
     System.out.print("이름? ");
@@ -28,63 +53,61 @@ public class MemberController {
     member.setTel(keyScan.nextLine());
 
     if (confirm("저장하시겠습니까?", true)) {
-      members[count++] = member;
+      members.add(member);
       System.out.println("저장하였습니다.");
     } else {
       System.out.println("저장을 취소하였습니다.");
     }
   }
 
-  public void doUpdate() {
+  private void doUpdate() {
     System.out.print("변경할 회원 번호는? ");
     int no = Integer.parseInt(keyScan.nextLine());
 
+    Member oldMember = (Member)members.get(no);
     Member member = new Member();
 
-    System.out.printf("이름(%s)? ", members[no].getName());
+    System.out.printf("이름(%s)? ", oldMember.getName());
     member.setName(keyScan.nextLine());
 
-    System.out.printf("이메일(%s)? ", members[no].getEmail());
+    System.out.printf("이메일(%s)? ", oldMember.getEmail());
     member.setEmail(keyScan.nextLine());
 
-    System.out.printf("암호(%s)? ", members[no].getPassword());
+    System.out.printf("암호(%s)? ", oldMember.getPassword());
     member.setPassword(keyScan.nextLine());
 
-    System.out.printf("전화(%s)? ", members[no].getTel());
+    System.out.printf("전화(%s)? ", oldMember.getTel());
     member.setTel(keyScan.nextLine());
 
     if (confirm("변경하시겠습니까?", true)) {
-      members[no] = member;
+      members.set(no, member);
       System.out.println("변경하였습니다.");
     } else {
       System.out.println("변경을 취소하였습니다.");
     }
   }
 
-  public void doList() {
-    for (int i = 0; i < count; i++) {
-      System.out.printf("%d, %s\n", i,
-        (members[i] != null) ? members[i].toString() : "");
+  private void doList() {
+    Member member = null;
+    for (int i = 0; i < members.size(); i++) {
+      member = (Member)members.get(i);
+      System.out.printf("%d, %s\n", i, member.toString());
     }
   }
 
-  public void doDelete() {
+  private void doDelete() {
     System.out.print("삭제할 회원 번호는? ");
     int no = Integer.parseInt(keyScan.nextLine());
 
     if (confirm("정말 삭제하시겠습니까?", true)) {
-      members[no] = null;
-      for (int i = no + 1; i < count; i++) {
-        members[i-1] = members[i];
-      }
-      count--;
+      members.remove(no);
       System.out.println("삭제하였습니다.");
     } else {
       System.out.println("삭제를 취소하였습니다.");
     }
   }
 
-  boolean confirm(String message, boolean strictMode) {
+  private boolean confirm(String message, boolean strictMode) {
     String input = null;
     do {
       System.out.printf("%s(y/n) ", message);

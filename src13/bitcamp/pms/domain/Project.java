@@ -9,7 +9,9 @@ public class Project {
   private String description;
   private int state;
 
-  public Project() {}
+  public Project() {
+
+  }
 
   public Project(String title, Date startDate, Date endDate) {
     this.title = title;
@@ -19,46 +21,37 @@ public class Project {
 
   @Override
   public String toString() {
-    return this.title + ", " + this.startDate + ", " +
-            this.endDate + ", " + this.description + ", " + this.state;
+    return this.title + "," + this.startDate + "," +
+    this.endDate + "," + this.state;
   }
 
   public String getTitle() {
-    return this.title;
+    return title;
   }
-
   public void setTitle(String title) {
     this.title = title;
   }
-
   public Date getStartDate() {
-    return this.startDate;
+    return startDate;
   }
-
   public void setStartDate(Date startDate) {
     this.startDate = startDate;
   }
-
   public Date getEndDate() {
-    return this.endDate;
+    return endDate;
   }
-
   public void setEndDate(Date endDate) {
     this.endDate = endDate;
   }
-
   public String getDescription() {
-    return this.description;
+    return description;
   }
-
   public void setDescription(String description) {
     this.description = description;
   }
-
   public int getState() {
-    return this.state;
+    return state;
   }
-
   public void setState(int state) {
     this.state = state;
   }

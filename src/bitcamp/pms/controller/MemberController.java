@@ -1,34 +1,16 @@
-/* 멤버 관리 명령 처리 추가
-1) service() 메서드 추가
-  => "회원관리에 오신 걸 환영합니다." 메시디 출력
-
-2) service()에서 회원 관리 명령 처리
-"회원관리>" 프롬프트를 출력하고,
-사용자로부터 add, list, update, delete 명령어를 입력받아 출력한다.
-만약 "main" 명령이 들어오면 메소드 실행을 종료한다.
----------------------------
-회원관리> add
-(예전과 같이 처리)
-회원관리> list
-(예전과 같이 처리)
-회원관리> update
-(예전과 같이 처리)
-회원관리> delete
-(예전과 같이 처리)
-회원관리> main
-(service() 실행 종료)
----------------------------
-
-*/
 package bitcamp.pms.controller;
 
 import java.util.Scanner;
 import bitcamp.pms.domain.Member;
+import bitcamp.pms.util.LinkedList;
 
 public class MemberController {
   private Scanner keyScan;
-  private Member[] members = new Member[1000];
-  private int count = 0;
+  private LinkedList<Member> members;
+
+  public MemberController() {
+    members = new LinkedList<Member>();
+  }
 
   public void setScanner(Scanner keyScan) {
     this.keyScan = keyScan;
@@ -71,7 +53,7 @@ public class MemberController {
     member.setTel(keyScan.nextLine());
 
     if (confirm("저장하시겠습니까?", true)) {
-      members[count++] = member;
+      members.add(member);
       System.out.println("저장하였습니다.");
     } else {
       System.out.println("저장을 취소하였습니다.");
@@ -81,23 +63,22 @@ public class MemberController {
   private void doUpdate() {
     System.out.print("변경할 회원 번호는? ");
     int no = Integer.parseInt(keyScan.nextLine());
-
+    Member oldMember = (Member)members.get(no);
     Member member = new Member();
-
-    System.out.printf("이름(%s)? ", members[no].getName());
+    System.out.printf("이름(%s)? ", oldMember.getName());
     member.setName(keyScan.nextLine());
 
-    System.out.printf("이메일(%s)? ", members[no].getEmail());
+    System.out.printf("이메일(%s)? ", oldMember.getEmail());
     member.setEmail(keyScan.nextLine());
 
-    System.out.printf("암호(%s)? ", members[no].getPassword());
+    System.out.printf("암호(%s)? ", oldMember.getPassword());
     member.setPassword(keyScan.nextLine());
 
-    System.out.printf("전화(%s)? ", members[no].getTel());
+    System.out.printf("전화(%s)? ", oldMember.getTel());
     member.setTel(keyScan.nextLine());
 
     if (confirm("변경하시겠습니까?", true)) {
-      members[no] = member;
+      members.set(no, member);
       System.out.println("변경하였습니다.");
     } else {
       System.out.println("변경을 취소하였습니다.");
@@ -105,9 +86,10 @@ public class MemberController {
   }
 
   private void doList() {
-    for (int i = 0; i < count; i++) {
-      System.out.printf("%d, %s\n", i,
-        (members[i] != null) ? members[i].toString() : "");
+    Member member = null;
+    for (int i = 0; i < members.size(); i++) {
+      member = (Member)members.get(i);
+      System.out.printf("%d, %s\n", i, member.toString());
     }
   }
 
@@ -116,11 +98,7 @@ public class MemberController {
     int no = Integer.parseInt(keyScan.nextLine());
 
     if (confirm("정말 삭제하시겠습니까?", true)) {
-      members[no] = null;
-      for (int i = no + 1; i < count; i++) {
-        members[i-1] = members[i];
-      }
-      count--;
+      members.remove(no);
       System.out.println("삭제하였습니다.");
     } else {
       System.out.println("삭제를 취소하였습니다.");
