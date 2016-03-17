@@ -1,21 +1,6 @@
 package bitcamp.pms.util;
 
-import bitcamp.pms.exception.OutOfIndexException;
-
 public class LinkedList<T> {
-  public class Bucket<T> {
-    T value;
-    Bucket<T> next;
-
-    public Bucket() {
-    }
-
-    public Bucket(T value, Bucket<T> next) {
-      this.value = value;
-      this.next = next;
-    }
-  }
-  
   Bucket<T> start;
   Bucket<T> end;
   int count;
@@ -39,7 +24,7 @@ public class LinkedList<T> {
   public void add(int index, T value) {
     //1) index 유효범위 검사
     if (index < 0 || index > this.count) {
-      throw new OutOfIndexException("인덱스가 유효하지 않습니다.");
+      return;
     }
 
     //2) index가 0일 때
@@ -68,10 +53,6 @@ public class LinkedList<T> {
   }
 
   public T get(int index) {
-    if (index < 0 || index >= count) {
-      throw new OutOfIndexException("인덱스가 유효하지 않습니다.");
-    }
-
     Bucket<T> cursor = start;
     for (int i = 0; i < index; i++) {
       cursor = cursor.next;
@@ -82,7 +63,7 @@ public class LinkedList<T> {
   public T remove(int index) {
     //1) index의 유효여부 검사: 0 미만 또는 count 이상이면 무효한 인덱스.
     if (index < 0 || index >= count) {
-      throw new OutOfIndexException("인덱스가 유효하지 않습니다.");
+      return null;
     }
 
     T temp = null;
@@ -111,7 +92,7 @@ public class LinkedList<T> {
   public T set(int index, T value) {
     //1) index의 유효여부 검사: 0 미만 또는 count 이상이면 무효한 인덱스.
     if (index < 0 || index >= count) {
-      throw new OutOfIndexException("인덱스가 유효하지 않습니다.");
+      return null;
     }
 
     Bucket<T> cursor = start;

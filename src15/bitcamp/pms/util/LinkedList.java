@@ -3,19 +3,6 @@ package bitcamp.pms.util;
 import bitcamp.pms.exception.OutOfIndexException;
 
 public class LinkedList<T> {
-  public class Bucket<T> {
-    T value;
-    Bucket<T> next;
-
-    public Bucket() {
-    }
-
-    public Bucket(T value, Bucket<T> next) {
-      this.value = value;
-      this.next = next;
-    }
-  }
-  
   Bucket<T> start;
   Bucket<T> end;
   int count;

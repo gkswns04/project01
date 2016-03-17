@@ -4,7 +4,6 @@ import java.util.Scanner;
 import java.sql.Date;
 import bitcamp.pms.domain.Project;
 import bitcamp.pms.util.LinkedList;
-import bitcamp.pms.exception.OutOfIndexException;
 
 public class ProjectController {
   private Scanner keyScan;
@@ -22,25 +21,20 @@ public class ProjectController {
     String input = null;
     while (true) {
       input = prompt();
-      try {
-        if (input.equals("main")) {
-          break;
-        } else if (input.equals("add")) {
-          doAdd();
-        } else if (input.equals("list")) {
-          doList();
-        } else if (input.equals("update")) {
-          doUpdate();
-        } else if (input.equals("delete")) {
-          doDelete();
-        } else {
-          System.out.println("지원하지 않는 명령어입니다.");
-        }
-      } catch (OutOfIndexException e) {
-        System.out.println("유효하지 않은 인덱스입니다.");
-      } catch (Exception e) {
-        System.out.println("오류 발생! 다시 작업해 주세요.");
+      if (input.equals("main")) {
+        break;
+      } else if (input.equals("add")) {
+        doAdd();
+      } else if (input.equals("list")) {
+        doList();
+      } else if (input.equals("update")) {
+        doUpdate();
+      } else if (input.equals("delete")) {
+        doDelete();
+      } else {
+        System.out.println("지원하지 않는 명령어입니다.");
       }
+
     }
   }
 
