@@ -1,16 +1,17 @@
 package bitcamp.pms.controller;
 
 import java.util.Scanner;
-import java.util.ArrayList;
 import java.sql.Date;
 import bitcamp.pms.domain.Project;
+import bitcamp.pms.util.LinkedList;
+import bitcamp.pms.exception.OutOfIndexException;
 
 public class ProjectController {
   private Scanner keyScan;
-  ArrayList<Project> projects;
+  LinkedList<Project> projects;
 
   public ProjectController() {
-    projects = new ArrayList<>();
+    projects = new LinkedList<>();
   }
 
   public void setScanner(Scanner keyScan) {
@@ -35,7 +36,7 @@ public class ProjectController {
         } else {
           System.out.println("지원하지 않는 명령어입니다.");
         }
-      } catch (IndexOutOfBoundsException e) {
+      } catch (OutOfIndexException e) {
         System.out.println("유효하지 않은 인덱스입니다.");
       } catch (Exception e) {
         System.out.println("오류 발생! 다시 작업해 주세요.");
