@@ -1,126 +1,107 @@
 package bitcamp.pms.controller;
 
 import java.util.Scanner;
-import java.util.ArrayList;
-import java.sql.Date;
 import bitcamp.pms.domain.Project;
+import bitcamp.pms.util.LinkedList;
+import bitcamp.pms.exception.OutOfIndexException;
+import java.sql.Date;
+
 
 public class ProjectController {
-  private Scanner keyScan;
-  ArrayList<Project> projects;
+  Scanner key = new Scanner(System.in);
 
-  public ProjectController() {
-    projects = new ArrayList<>();
-  }
-
-  public void setScanner(Scanner keyScan) {
-    this.keyScan = keyScan;
-  }
-
+  Project project;
+  LinkedList<Project> projects = new LinkedList<>();
+  String check = null;
+  int no;
   public void service() {
-    String input = null;
-    while (true) {
-      input = prompt();
+    while(true){
+      System.out.print("회원관리> ");
+      check = key.nextLine().toLowerCase();
       try {
-        if (input.equals("main")) {
+        switch(check) {
+          case "add":
+          project = new Project();
+          System.out.print("제목? ");
+          project.setTitle(key.nextLine());
+          System.out.print("시작일? ");
+          project.setStartDate(Date.valueOf(key.nextLine()));
+          System.out.print("종료일? ");
+          project.setEndDate(Date.valueOf(key.nextLine()));
+          System.out.print("설명? ");
+          project.setDescription(key.nextLine());
+          if(confirm("저장")) {
+            projects.add(project);
+
+          }
+          project = null;
           break;
-        } else if (input.equals("add")) {
-          doAdd();
-        } else if (input.equals("list")) {
-          doList();
-        } else if (input.equals("update")) {
-          doUpdate();
-        } else if (input.equals("delete")) {
-          doDelete();
-        } else {
-          System.out.println("지원하지 않는 명령어입니다.");
+
+          case "delete":
+          System.out.println("삭제할 번호?");
+          no = Integer.parseInt(key.nextLine());
+
+          if(confirm("삭제")) {
+            projects.remove(no);
+          }
+          break;
+
+          case "update":
+          project = new Project();
+          System.out.print("변경할 번호?");
+
+          System.out.println(projects.get(Integer.parseInt(key.nextLine())));
+          System.out.println("-----------------------");
+          System.out.print("제목? ");
+          project.setTitle(key.nextLine());
+          System.out.print("시작일? ");
+          project.setStartDate(Date.valueOf(key.nextLine()));
+          System.out.print("종료일? ");
+          project.setEndDate(Date.valueOf(key.nextLine()));
+          System.out.print("설명? ");
+          project.setDescription(key.nextLine());
+          if(confirm("변경")) {
+            projects.set(no,project);
+
+          }
+          project = null;
+          break;
+
+          case "list":
+
+          for(int i = 0; i <projects.size(); i++) {
+           System.out.println(i +", "+ projects.get(i));
+          }
+          break;
+
+          case "main":
+          return ;
+          default:
+          System.out.println("잘못입력");
         }
-      } catch (IndexOutOfBoundsException e) {
-        System.out.println("유효하지 않은 인덱스입니다.");
-      } catch (Exception e) {
-        System.out.println("오류 발생! 다시 작업해 주세요.");
+      } catch (OutOfIndexException e) {
+        System.out.println("인덱스 오류입니다");
+      } catch(RuntimeException e) {
+        System.out.println("잘못된 형식입니다");
       }
     }
   }
 
-  private String prompt() {
-    System.out.print("프로젝트관리> ");
-    return keyScan.nextLine();
-  }
-
-  private void doAdd() {
-    Project project = new Project();
-
-    System.out.print("프로젝트명? ");
-    project.setTitle(keyScan.nextLine());
-    System.out.print("시작일? ");
-    project.setStartDate(Date.valueOf(keyScan.nextLine()));
-    System.out.print("종료일? ");
-    project.setEndDate(Date.valueOf(keyScan.nextLine()));
-    System.out.print("설명? ");
-    project.setDescription(keyScan.nextLine());
-
-    if (confirm("저장하시겠습니까?")) {
-      projects.add(project);
-      System.out.println("저장하였습니다.");
-    } else {
-      System.out.println("저장을 취소하였습니다.");
-    }
-  }
-
-  private boolean confirm(String message) {
-    while (true) {
-      System.out.printf("%s(y/n) ", message);
-      String input = keyScan.nextLine().toLowerCase();
-      if (input.equals("y")) {
+  public boolean confirm(String msg) {
+    while(true) {
+      System.out.println(msg + "하시겠습니까?(y/n) ");
+      check = key.nextLine().toLowerCase();
+      if(check.equals("y")) {
+        System.out.println(msg + "합니다. ");
         return true;
-      } else if (input.equals("n")) {
+      } else if(check.equals("n")) {
+        System.out.println(msg + "을 취소합니다. ");
         return false;
-      } else {
-        System.out.println("잘못된 명령어입니다.");
+
+      }else{
+        System.out.println("잘못 입력");
+
       }
-    }
-  }
-
-  private void doList() {
-    for (int i = 0; i < projects.size(); i++) {
-      System.out.printf("%d, %s\n", i, projects.get(i).toString());
-    }
-  }
-
-  private void doUpdate() {
-    System.out.print("변경할 프로젝트 번호?");
-    int no = Integer.parseInt(keyScan.nextLine());
-
-    Project oldProject = projects.get(no);
-    Project project = new Project();
-
-    System.out.printf("프로젝트명(%s)? ", oldProject.getTitle());
-    project.setTitle(keyScan.nextLine());
-    System.out.printf("시작일(%s)? ", oldProject.getStartDate());
-    project.setStartDate(Date.valueOf(keyScan.nextLine()));
-    System.out.printf("종료일(%s)? ", oldProject.getEndDate());
-    project.setEndDate(Date.valueOf(keyScan.nextLine()));
-    System.out.printf("설명(%s)? ", oldProject.getDescription());
-    project.setDescription(keyScan.nextLine());
-
-    if (confirm("변경하시겠습니까?")) {
-      projects.set(no, project);
-      System.out.println("변경하였습니다.");
-    } else {
-      System.out.println("변경을 취소하였습니다.");
-    }
-  }
-
-  private void doDelete() {
-    System.out.print("삭제할 프로젝트 번호?");
-    int no = Integer.parseInt(keyScan.nextLine());
-
-    if (confirm("정말 삭제하시겠습니까?")) {
-      projects.remove(no);
-      System.out.println("삭제하였습니다.");
-    } else {
-      System.out.println("삭제를 취소하였습니다.");
     }
   }
 }
