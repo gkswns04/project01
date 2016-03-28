@@ -1,28 +1,35 @@
+/* 기능 요구사항
+ * 1) list    --> 제목, 조회수, 생성일
+ * 2) add     --> 제목, 내용, 암호
+ * 3) update  --> 제목, 내용, 암호
+ * 4) delete  --> 인덱스로 삭제할 게시물을 지정한다.
+ */
 package bitcamp.pms.controller;
 
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Map;
-import java.sql.Date;
-import bitcamp.pms.domain.Project;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.PrintWriter;
-import java.io.FileReader;
-import java.io.BufferedReader;
+import java.util.Scanner;
 
-public class ProjectController implements MenuController {
-  private static final String filename = "project.data";
+import bitcamp.pms.domain.Board;
+
+public class BoardController implements MenuController {
+  private static final String filename = "board.data";
   private Scanner keyScan;
-  ArrayList<Project> projects;
+  ArrayList<Board> boards;
 
-  public ProjectController() {
-    projects = new ArrayList<>();
+  public BoardController() {
+    boards = new ArrayList<>();
   }
   
   @Override
   public String toString() {
-    return "project";
+    return "board";
   }
 
   public void load() throws Exception {
@@ -31,15 +38,17 @@ public class ProjectController implements MenuController {
 
     String line;
     String[] values;
-    Project project;
+    Board board;
     while ((line = in.readLine()) != null) {
       values = line.split(",");
-      project = new Project(values[0],
-                            Date.valueOf(values[1]),
-                            Date.valueOf(values[2]));
-      project.setState(Integer.parseInt(values[3]));
-      project.setDescription(values[4]);
-      projects.add(project);
+      board = new Board();
+      board.setTitle(values[0]);
+      board.setContent(values[1]);
+      board.setViews(Integer.parseInt(values[2]));
+      board.setPassword(values[3]);
+      board.setCreatedDate(Date.valueOf(values[4]));
+
+      boards.add(board);
     }
 
     in.close();
@@ -51,8 +60,8 @@ public class ProjectController implements MenuController {
     BufferedWriter out1 = new BufferedWriter(out0);
     PrintWriter out = new PrintWriter(out1);
 
-    for (Project project : projects) {
-      out.println(project);
+    for (Board board : boards) {
+      out.println(board.toCSV());
     }
 
     out.close();
@@ -65,7 +74,7 @@ public class ProjectController implements MenuController {
     try {
       this.load();
     } catch (Exception e) {
-      throw new RuntimeException("프로젝트 데이터 로딩 실패!", e);
+      throw new RuntimeException("게시물 데이터 로딩 실패!", e);
     }
   }
 
@@ -106,24 +115,23 @@ public class ProjectController implements MenuController {
   }
 
   private String prompt() {
-    System.out.print("프로젝트관리> ");
+    System.out.print("게시물관리> ");
     return keyScan.nextLine();
   }
 
   private void doAdd() {
-    Project project = new Project();
+    Board board = new Board();
 
-    System.out.print("프로젝트명? ");
-    project.setTitle(keyScan.nextLine());
-    System.out.print("시작일? ");
-    project.setStartDate(Date.valueOf(keyScan.nextLine()));
-    System.out.print("종료일? ");
-    project.setEndDate(Date.valueOf(keyScan.nextLine()));
-    System.out.print("설명? ");
-    project.setDescription(keyScan.nextLine());
-
+    System.out.print("제목? ");
+    board.setTitle(keyScan.nextLine());
+    System.out.print("내용? ");
+    board.setContent(keyScan.nextLine());
+    System.out.print("암호? ");
+    board.setPassword(keyScan.nextLine());
+    board.setCreatedDate(new Date(System.currentTimeMillis()));
+    
     if (confirm("저장하시겠습니까?")) {
-      projects.add(project);
+      boards.add(board);
       System.out.println("저장하였습니다.");
     } else {
       System.out.println("저장을 취소하였습니다.");
@@ -145,29 +153,28 @@ public class ProjectController implements MenuController {
   }
 
   private void doList() {
-    for (int i = 0; i < projects.size(); i++) {
-      System.out.printf("%d, %s\n", i, projects.get(i).toString());
+    for (int i = 0; i < boards.size(); i++) {
+      System.out.printf("%d, %s\n", i, boards.get(i).toString());
     }
   }
 
   private void doUpdate() {
-    System.out.print("변경할 프로젝트 번호?");
+    System.out.print("변경할 게시물 번호?");
     int no = Integer.parseInt(keyScan.nextLine());
 
-    Project oldProject = projects.get(no);
-    Project project = new Project();
+    Board oldBoard = boards.get(no);
+    Board board = new Board();
 
-    System.out.printf("프로젝트명(%s)? ", oldProject.getTitle());
-    project.setTitle(keyScan.nextLine());
-    System.out.printf("시작일(%s)? ", oldProject.getStartDate());
-    project.setStartDate(Date.valueOf(keyScan.nextLine()));
-    System.out.printf("종료일(%s)? ", oldProject.getEndDate());
-    project.setEndDate(Date.valueOf(keyScan.nextLine()));
-    System.out.printf("설명(%s)? ", oldProject.getDescription());
-    project.setDescription(keyScan.nextLine());
+    System.out.printf("제목(%s)? ", oldBoard.getTitle());
+    board.setTitle(keyScan.nextLine());
+    System.out.printf("내용(%s)? ", oldBoard.getContent());
+    board.setContent(keyScan.nextLine());
+    System.out.printf("암호? ", oldBoard.getPassword());
+    board.setPassword(keyScan.nextLine());
+    board.setCreatedDate(new Date(System.currentTimeMillis()));
 
     if (confirm("변경하시겠습니까?")) {
-      projects.set(no, project);
+      boards.set(no, board);
       System.out.println("변경하였습니다.");
     } else {
       System.out.println("변경을 취소하였습니다.");
@@ -175,11 +182,11 @@ public class ProjectController implements MenuController {
   }
 
   private void doDelete() {
-    System.out.print("삭제할 프로젝트 번호?");
+    System.out.print("삭제할 게시물 번호?");
     int no = Integer.parseInt(keyScan.nextLine());
 
     if (confirm("정말 삭제하시겠습니까?")) {
-      projects.remove(no);
+      boards.remove(no);
       System.out.println("삭제하였습니다.");
     } else {
       System.out.println("삭제를 취소하였습니다.");
