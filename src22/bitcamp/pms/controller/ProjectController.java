@@ -73,8 +73,8 @@ public class ProjectController implements MenuController {
 
     String input = null;
     while (true) {
+      input = prompt();
       try {
-        input = prompt();
         if (input.equals("main")) {
           break;
         } else if (input.equals("add")) {
@@ -104,7 +104,6 @@ public class ProjectController implements MenuController {
   }
 
   private String prompt() {
-    
     System.out.print("프로젝트관리> ");
     return keyScan.nextLine();
   }
