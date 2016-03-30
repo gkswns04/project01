@@ -1,9 +1,20 @@
 /* 목표
-- 애노테이션을 이용하여 ApplicationContext에서 생성할 객체를 관리한다.
-- 작업 절차
-1) Component 애노테이션 생성
-2) MenuController 구현체에 애노테이션 적용
-3) ApplicationContext 클래스 변경
+- 커맨드 패턴을 적용하여 명령어 당 한 개의 처리 클래스로 구성하라. 
+예)
+[이전 방식]
+명령> go member
+프로젝트관리> list
+
+[변경 방식]
+명령> member/list.do
+.....
+명령> member/add.do
+.....
+
+- 작업절차
+1) MemberController 클래스를 다음 클래스들로 분리한다.
+   MemberListController, MemberAddController, MemberUpdateController, 
+   MemberDeleteController
    
 
 */
@@ -54,7 +65,16 @@ public class ProjectApp {
     } else if (cmds[0].equals("go")) {
       doGo(cmds);
     } else {
-      doError();
+      MenuController controller = (MenuController)appContext.getBean(cmds[0]);
+      if (controller != null) {
+        // 작업에 필요한 재료를 준비
+        HashMap<String,Object> paramMap = new HashMap<>();
+        paramMap.put("stdin", keyScan);
+        
+        controller.service(paramMap);
+      } else {
+        doError();
+      }
     }
   }
 
