@@ -145,7 +145,96 @@
 - 프로젝트 정보를 등록, 목록조회, 변경, 삭제하는 기능을 추가한다.
 - 사용 문법:
   => 클래스 정의
-  => 여러 클래스의 인스턴스를 다루는 방법 
+  => 여러 클래스의 인스턴스를 다루는 방법
+
+#13
+- 프로젝트 정보 또는 회원 정보를 등록할 때 개수에 제한을 두지 않게 한다.
+- 사용문법:
+  => Linked List 도입
+  => java01/src/algorithm/ex01/ 의 LinkedList와 Bucket 클래스를 사용한다.
+- MemberController와 ProjectController에 적용한다.  
+
+#14
+- 제네릭을 적용한 LinkedList를 사용하여 회원 정보 및 프로젝트 정보를 관리하라!
+- 사용문법:
+  => Generic을 적용한 LinkedList
+  => java01/src/algorithm/ex04/ 의 LinkedList와 Bucket 클래스를 사용한다.
+
+#15
+- LinkedList에 예외 적용.
+- 사용문법:
+  => try ~ catch ~
+  => throw ~
+
+#16
+- Bucket 클래스를 LinkedList의 중첩 클래스로 만든다.
+- 왜? Bucket은 LinkedList에서만 사용하기 때문이다.
+
+#17
+- ArrayList 클래스를 적용하라!
+
+#18
+- 사용자 입력한 데이터를 Stream API를 사용하여 저장하고 로딩하라.
+
+#19
+- 메뉴를 처리하기 위해 호출하는 service() 메서드를 규칙으로 정의한다.
+  => 향후 메뉴를 처리하는 모든 클래스는 이 인터페이스의 규칙에 따라 작성해야 한다.
+
+#20
+- 리플랙션(Reflection) API를 사용하여 메뉴 컨트롤러를 객체를 자동 생성하라!
+  => 인스턴스 생성을 자동화시킨다.
+
+#21
+- High Cohesion OOP 설계 방법 적용
+  => ProjectApp은 사용자에게 프롬프트를 출력하고 입력 받는 일도 하고,
+     메뉴 처리기를 준비하는 일도 한다. 
+
+#22
+- 객체를 보관할 때 사용할 이름은 애노테이션으로부터 얻는다.
+  => 애노테이션 적용!
+
+#23
+- 커맨드 패턴을 적용하여 명령어 당 한 개의 처리 클래스로 구성하라. 
+예)
+[이전 방식]
+명령> go member
+프로젝트관리> list
+
+[변경 방식]
+명령> member/list.do
+.....
+명령> member/add.do
+.....
+
+#24
+- 여러 컨트롤러에 중복되어 있는 기능을 한 클래스로 만든다.
+- Data를 처리하는 전문 클래스를 도입한다. 
+  => "DAO"라 부른다. Data Access Object
+  => Data Persistence 객체 
+  
+#25
+- Information Expert 패턴에 따라 XxxDao 클래스가 데이터 처리를
+  완전히 담당하게 개선하라!
+
+#26
+- 객체 공유와 의존 객체 주입(Dependency Injection) 적용
+
+#27
+- @RequestMapping 애노테이션을 추가한다.
+  => 명령어를 처리하는 메서드를 지정한다.
+  => MenuController 인터페이스가 필요없어 진다.
+- XxxController는 MenuController 인터페이스를 구현하는 대신에
+  @RequestMapping 애노테이션을 사용하여
+  ProjectApp이 호출할 메서드를 지정한다.
+
+#28
+- 명령어를 처리하는 메서드(RequestHandler)의 파라미터 선언을 자유롭게 하도록 
+  변경한다. 
+- ProjectApp에서는 메서드를 호출하기 전에 파라미터를 분서하여 그에 맞는
+  값을 준비해야 한다.  
+
+
+
 
 
 
