@@ -13,7 +13,6 @@ import bitcamp.pms.util.CommandUtil;
 @Controller
 @RequestMapping("project/")
 public class ProjectController {
-/*
   private ProjectDao projectDao;
   
   public void setProjectDao(ProjectDao projectDao) {
@@ -80,6 +79,7 @@ public class ProjectController {
             project.getState());
       }
     } catch (Exception e) {
+      e.printStackTrace();
       System.out.println("데이터 로딩에 실패했습니다.");
     }
   }
@@ -119,5 +119,4 @@ public class ProjectController {
       System.out.println("데이터 로딩에 실패했습니다.");
     }
   }
-*/
 }

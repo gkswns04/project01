@@ -36,24 +36,29 @@ public class ApplicationContext {
     for (Object obj : objects) {
       clazz = obj.getClass();
       
+      //우리가 만든 클래스(@Component, @Controller)에 대해서만 의존 객체 주입을 수행한다.
+      //=> 빈 컨테이너가 우리가 만든 객체 외에 다른 객체도 포함하기 때문에
+      //   의존 객체 주입할 때 검사해야 한다.
       if (!clazz.isAnnotationPresent(Component.class) && 
           !clazz.isAnnotationPresent(Controller.class)) {
         continue;
       }
       
+      //System.out.println(clazz.getName());
       methods = clazz.getMethods();
       for (Method m : methods) {
         if (!m.getName().startsWith("set")) 
           continue;
         
         paramType = m.getParameterTypes()[0];
+        //System.out.printf("--->%s(%s)\n", m.getName(), paramType.getName());   
         dependency = findObjectByType(paramType);
         
-        if (dependency == null) 
+        if (dependency == null) // 셋터가 원하는 의존 객체를 찾지 못하면, 
           continue;
 
         try {
-          m.invoke(obj, dependency); 
+          m.invoke(obj, dependency); // 셋터를 호출하여 의존 객체를 주입한다.
         } catch (Exception e) {}
       }
     }
@@ -79,10 +84,13 @@ public class ApplicationContext {
       try {
         Class<?> clazz = Class.forName(classNameWithPackage);
         
+        // @Component 또는 @Controller 애노테이션을 구분하여 처리한다.
         if (clazz.getAnnotation(Component.class) != null) {
+          //System.out.printf("%s --> %s\n", clazz.getName(), "Component");
           processComponentAnnotation(clazz);
           
         } else if (clazz.getAnnotation(Controller.class) != null) {
+          //System.out.printf("%s --> %s\n", clazz.getName(), "Controller");
           processControllerAnnotation(clazz);
         }  
         
@@ -91,9 +99,6 @@ public class ApplicationContext {
       }
       return;
     } 
-    
-    if (!file.isDirectory()) // .class 이나 디렉토리가 아닌 경우,
-      return;
     
     File[] subfiles = file.listFiles();
     for (File subfile : subfiles) {
@@ -138,7 +143,10 @@ public class ApplicationContext {
   }
 
   public Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annoType) {
+    // 전체 객체 목록 
     Set<Entry<String,Object>> entrySet = objPool.entrySet();
+    
+    // 특정 애노테이션이 붙은 객체 목록
     HashMap<String, Object> objMap = new HashMap<>();
     
     Object obj = null;
@@ -164,6 +172,7 @@ public class ApplicationContext {
     return null;
   }
   
+  // 외부에서 임의로 객체를 추가할 수 있게 한다.
   public void addBean(String name, Object bean) {
     objPool.put(name, bean);
     injectDependency();

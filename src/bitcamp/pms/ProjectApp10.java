@@ -24,7 +24,7 @@ import bitcamp.pms.context.ApplicationContext;
 import bitcamp.pms.context.request.RequestHandler;
 import bitcamp.pms.context.request.RequestHandlerMapping;
 
-public class ProjectApp {
+public class ProjectApp10 {
   static ApplicationContext appContext;
   static RequestHandlerMapping requestHandlerMapping;
   static Scanner keyScan = new Scanner(System.in);
@@ -142,7 +142,7 @@ public class ProjectApp {
     while (true) {
       System.out.print("전화: ");
       tel = keyScan.nextLine();
-      if (tel.matches("(\\d{2,4}-)?\\d{3,4}-\\d{4}"))
+      if (tel.matches("(\\d{2,4})?-\\d{3,4}-\\d{4}"))
         break;
       System.out.println("전화 형식에 맞지 않습니다. 예) 02-123-1234");
     }
