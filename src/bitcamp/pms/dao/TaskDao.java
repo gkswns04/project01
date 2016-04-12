@@ -6,53 +6,53 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import bitcamp.pms.annotation.Component;
-import bitcamp.pms.domain.Project;
+import bitcamp.pms.domain.Task;
 
 @Component
-public class ProjectDao {
+public class TaskDao {
   SqlSessionFactory sqlSessionFactory;
   
-  public ProjectDao() {}
+  public TaskDao() {}
  
   public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
     this.sqlSessionFactory = sqlSessionFactory;
   }
   
-  public List<Project> selectList() throws Exception {
+  public List<Task> selectList() throws Exception {
     SqlSession sqlSession = sqlSessionFactory.openSession();
     
     try {
-      return sqlSession.selectList("ProjectDao.selectList");
+      return sqlSession.selectList("TaskDao.selectList");
     } finally {
       sqlSession.close();
     }
   }
   
-  public Project selectOne(int no) throws Exception {
+  public Task selectOne(int no) throws Exception {
     SqlSession sqlSession = sqlSessionFactory.openSession();
     
     try {
-      return sqlSession.selectOne("ProjectDao.selectOne", no);
+      return sqlSession.selectOne("TaskDao.selectOne", no);
     } finally {
       sqlSession.close();
     }
   }
  
-  public int insert(Project project) throws Exception {
+  public int insert(Task task) throws Exception {
     SqlSession sqlSession = sqlSessionFactory.openSession(true);
     
     try {
-      return sqlSession.insert("ProjectDao.insert", project);
+      return sqlSession.insert("TaskDao.insert", task);
     } finally {
       sqlSession.close();
     }
   }
   
-  public int update(Project project) throws Exception {
+  public int update(Task task) throws Exception {
     SqlSession sqlSession = sqlSessionFactory.openSession();
     
     try {
-      int count = sqlSession.update("ProjectDao.update", project);
+      int count = sqlSession.update("TaskDao.update", task);
       sqlSession.commit();
       return count;
     } finally {
@@ -64,7 +64,7 @@ public class ProjectDao {
     SqlSession sqlSession = sqlSessionFactory.openSession();
     
     try {
-      int count = sqlSession.delete("ProjectDao.delete", no);
+      int count = sqlSession.delete("TaskDao.delete", no);
       sqlSession.commit();
       return count;
       

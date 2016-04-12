@@ -1,141 +1,76 @@
 package bitcamp.pms.dao;
 
+import java.util.List;
+
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+
 import bitcamp.pms.annotation.Component;
+import bitcamp.pms.domain.Board;
 
 @Component
 public class BoardDao {
-/*
-
+  SqlSessionFactory sqlSessionFactory;
+  
+  public BoardDao() {}
+ 
+  public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
+    this.sqlSessionFactory = sqlSessionFactory;
+  }
+  
   public List<Board> selectList() throws Exception {
-    ArrayList<Board> list = new ArrayList<>();
-    
-    Connection con = null;
-    Statement stmt = null;
-    ResultSet rs = null;
+    SqlSession sqlSession = sqlSessionFactory.openSession();
     
     try {
-      con = dataSource.getConnection();
-      stmt = con.createStatement();
-      rs = stmt.executeQuery("select * from BOARDS");
-      Board board = null;
-      
-      while (rs.next()) { 
-        board = new Board();
-        board.setNo(rs.getInt("BNO"));
-        board.setTitle(rs.getString("TITLE"));
-        board.setContent(rs.getString("CONTS"));
-        board.setViews(rs.getInt("VWCNT"));
-        board.setPassword(rs.getString("PWD"));
-        board.setCreatedDate(rs.getDate("CDT"));
-        list.add(board);
-      }
-      return list;
-    
+      return sqlSession.selectList("BoardDao.selectList");
     } finally {
-      try {rs.close();} catch (Exception e) {}
-      try {stmt.close();} catch (Exception e) {}
-      dataSource.returnConnection(con);
+      sqlSession.close();
     }
   }
   
   public Board selectOne(int no) throws Exception {
-    Connection con = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
+    SqlSession sqlSession = sqlSessionFactory.openSession();
     
     try {
-      con = dataSource.getConnection();
-      stmt = con.prepareStatement("select * from BOARDS where BNO=?");
-      stmt.setInt(1, no);
-      rs = stmt.executeQuery();
-      
-      if (rs.next()) { 
-        Board board = new Board();
-        board.setNo(rs.getInt("BNO"));
-        board.setTitle(rs.getString("TITLE"));
-        board.setContent(rs.getString("CONTS"));
-        board.setViews(rs.getInt("VWCNT"));
-        board.setPassword(rs.getString("PWD"));
-        board.setCreatedDate(rs.getDate("CDT"));
-        return board;
-      }
-      
-      return null;
-    
+      return sqlSession.selectOne("BoardDao.selectOne", no);
     } finally {
-      try {rs.close();} catch (Exception e) {}
-      try {stmt.close();} catch (Exception e) {}
-      dataSource.returnConnection(con);
+      sqlSession.close();
     }
   }
-  
+ 
   public int insert(Board board) throws Exception {
-    Connection con = null;
-    PreparedStatement stmt = null;
+    SqlSession sqlSession = sqlSessionFactory.openSession(true);
     
     try {
-      con = dataSource.getConnection();
-      stmt = con.prepareStatement(
-          "insert into BOARDS(TITLE,CONTS,PWD,CDT)"
-          + " values(?,?,?,now())");
-
-      stmt.setString(1, board.getTitle());
-      stmt.setString(2, board.getContent());
-      stmt.setString(3, board.getPassword());
-      
-      return stmt.executeUpdate();
-      
+      return sqlSession.insert("BoardDao.insert", board);
     } finally {
-      try {stmt.close();} catch (Exception e) {}
-      dataSource.returnConnection(con);
+      sqlSession.close();
     }
   }
   
   public int update(Board board) throws Exception {
-    Connection con = null;
-    PreparedStatement stmt = null;
+    SqlSession sqlSession = sqlSessionFactory.openSession();
     
     try {
-      con = dataSource.getConnection();
-      stmt = con.prepareStatement(
-          "update BOARDS set TITLE=?, CONTS=?, CDT=now() where BNO=?");
-
-      stmt.setString(1, board.getTitle());
-      stmt.setString(2, board.getContent());
-      stmt.setInt(3, board.getNo());
-      
-      return stmt.executeUpdate();
-      
+      int count = sqlSession.update("BoardDao.update", board);
+      sqlSession.commit();
+      return count;
     } finally {
-      try {stmt.close();} catch (Exception e) {}
-      dataSource.returnConnection(con);
+      sqlSession.close();
     }
   }
   
   public int delete(int no) throws Exception {
-    Connection con = null;
-    PreparedStatement stmt = null;
+    SqlSession sqlSession = sqlSessionFactory.openSession();
     
     try {
-      con = dataSource.getConnection();
-      stmt = con.prepareStatement("delete from BOARDS where BNO=?");
-      stmt.setInt(1, no);
-      return stmt.executeUpdate();
+      int count = sqlSession.delete("BoardDao.delete", no);
+      sqlSession.commit();
+      return count;
       
     } finally {
-      try {stmt.close();} catch (Exception e) {}
-      dataSource.returnConnection(con);
+      sqlSession.close();
     }
   }
-  */
+
 }
-
-
-
-
-
-
-
-
-
-

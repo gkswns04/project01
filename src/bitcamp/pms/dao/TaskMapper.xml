@@ -3,49 +3,49 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
-<mapper namespace="ProjectDao">
+<mapper namespace="TaskDao">
   <!-- 테이블의 컬럼 이름과 VO 클래스의 프로퍼티 이름을 미리 연결해 둘 수 있다. -->
-  <resultMap type="Project" id="ProjectMap">
+  <resultMap type="Task" id="TaskMap">
     <!-- pk 컬럼은 id 태그로 선언하라! -->
-    <id column="PNO" property="no"/>
+    <id column="TNO" property="no"/>
+    <result column="CONTS" property="content"/>
     <result column="SDT" property="startDate"/>
     <result column="EDT" property="endDate"/>
-    <result column="DESCT" property="description"/>
     <result column="STAT" property="state"/>
   </resultMap>
 
   <!-- 파라미터나 결과에 대해 데이터 타입을 지정할 때,
        mybatis 설정 파일에 선언된 별명을 사용한다.
    -->
-  <insert id="insert" parameterType="Project">
-    insert into PROJECTS(TITLE,SDT,EDT,DESCT)
-    values(#{title},#{startDate},#{endDate},#{description})
+  <insert id="insert" parameterType="Task">
+    insert into TASKS(EMAIL,TITLE,SDT,EDT)
+    values(#{workerEmail},#{title},#{startDate},#{endDate})
   </insert>
   
-  <update id="update" parameterType="Project">
-    update PROJECTS set
+  <update id="update" parameterType="Task">
+    update TASKS set
+      EMAIL=#{workerEmail},
       TITLE=#{title},
+      CONTS=#{content},
       SDT=#{startDate},
-      EDT=#{endDate},
-      DESCT=#{description},
-      STAT=#{state}
-    where PNO=#{no}
+      EDT=#{endDate}
+    where TNO=#{no}
   </update>
   
   <delete id="delete" parameterType="int">
-    delete from PROJECTS
-    where PNO=#{no}
+    delete from TASKS
+    where TNO=#{no}
   </delete>
   
-  <select id="selectList" resultMap="ProjectMap">
-    select PNO, TITLE, SDT, EDT, DESCT, STAT
-    from PROJECTS
+  <select id="selectList" resultMap="TaskMap">
+    select TNO, EMAIL, TITLE, CONTS, SDT, EDT, STAT
+    from TASKS
   </select>
   
-  <select id="selectOne" parameterType="int" resultMap="ProjectMap">
-    select PNO, TITLE, SDT, EDT, DESCT, STAT
-    from PROJECTS
-    where PNO=#{no}
+  <select id="selectOne" parameterType="int" resultMap="TaskMap">
+    select TNO, EMAIL, TITLE, CONTS, SDT, EDT, STAT
+    from TASKS
+    where TNO=#{no}
   </select>
 </mapper>
 

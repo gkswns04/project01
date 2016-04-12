@@ -6,40 +6,42 @@ import java.util.Scanner;
 
 import bitcamp.pms.annotation.Controller;
 import bitcamp.pms.annotation.RequestMapping;
-import bitcamp.pms.dao.ProjectDao;
-import bitcamp.pms.domain.Project;
+import bitcamp.pms.dao.TaskDao;
+import bitcamp.pms.domain.Task;
 import bitcamp.pms.util.CommandUtil;
 
 @Controller
-@RequestMapping("project/")
-public class ProjectController {
-  private ProjectDao projectDao;
+@RequestMapping("task/")
+public class TaskController {
+  private TaskDao taskDao;
   
-  public void setProjectDao(ProjectDao projectDao) {
-    this.projectDao = projectDao;
+  public void setTaskDao(TaskDao taskDao) {
+    this.taskDao = taskDao;
   }
 
   @RequestMapping("add.do")
   public void add(Scanner keyScan) {
     try {
-      Project project = new Project();
+      Task task = new Task();
 
-      System.out.print("프로젝트명? ");
-      project.setTitle(keyScan.nextLine());
+      System.out.print("이메일? ");
+      task.setWorkerEmail(keyScan.nextLine());
+      System.out.print("작업명? ");
+      task.setTitle(keyScan.nextLine());     
       System.out.print("시작일? ");
-      project.setStartDate(Date.valueOf(keyScan.nextLine()));
+      task.setStartDate(Date.valueOf(keyScan.nextLine()));
       System.out.print("종료일? ");
-      project.setEndDate(Date.valueOf(keyScan.nextLine()));
-      System.out.print("설명? ");
-      project.setDescription(keyScan.nextLine());
+      task.setEndDate(Date.valueOf(keyScan.nextLine()));
+      
 
       if (CommandUtil.confirm(keyScan, "저장하시겠습니까?")) {
-        projectDao.insert(project);
+        taskDao.insert(task);
         System.out.println("저장하였습니다.");
       } else {
         System.out.println("저장을 취소하였습니다.");
       }
     } catch (Exception e) {
+      e.printStackTrace();
       System.out.println("데이터 로딩에 실패했습니다.");
     }
   }
@@ -47,11 +49,11 @@ public class ProjectController {
   @RequestMapping("delete.do")
   public void delete(Scanner keyScan) {
     try {
-      System.out.print("삭제할 프로젝트 번호?");
+      System.out.print("삭제할 작업 번호?");
       int no = Integer.parseInt(keyScan.nextLine());
 
       if (CommandUtil.confirm(keyScan, "정말 삭제하시겠습니까?")) {
-        int count = projectDao.delete(no);
+        int count = taskDao.delete(no);
         if (count > 0) {
           System.out.println("삭제하였습니다.");
         } else {
@@ -69,17 +71,12 @@ public class ProjectController {
   @RequestMapping("list.do")
   public void list() {
     try {
-      List<Project> projects = projectDao.selectList();
-      for (Project project : projects) {
-        System.out.printf("%d, %s, %s, %s, %d\n", 
-            project.getNo(),
-            project.getTitle(),
-            project.getStartDate(),
-            project.getEndDate(),
-            project.getState());
+      List<Task> tasks = taskDao.selectList();
+      for (Task task : tasks) {
+        System.out.println(task); 
+            
       }
     } catch (Exception e) {
-      e.printStackTrace();
       System.out.println("데이터 로딩에 실패했습니다.");
     }
   }
@@ -87,26 +84,28 @@ public class ProjectController {
   @RequestMapping("update.do")
   public void update(Scanner keyScan) {
     try {
-      System.out.print("변경할 프로젝트 번호?");
+      System.out.print("변경할 작업 번호?");
       int no = Integer.parseInt(keyScan.nextLine());
 
-      Project project = projectDao.selectOne(no);
-      if (project == null) {
+      Task task = taskDao.selectOne(no);
+      if (task == null) {
         System.out.println("유효하지 않은 번호입니다.");
         return;
       }
 
-      System.out.printf("프로젝트명(%s)? ", project.getTitle());
-      project.setTitle(keyScan.nextLine());
-      System.out.printf("시작일(%s)? ", project.getStartDate());
-      project.setStartDate(Date.valueOf(keyScan.nextLine()));
-      System.out.printf("종료일(%s)? ", project.getEndDate());
-      project.setEndDate(Date.valueOf(keyScan.nextLine()));
-      System.out.printf("설명(%s)? ", project.getDescription());
-      project.setDescription(keyScan.nextLine());
+      System.out.print("이메일? ");
+      task.setWorkerEmail(keyScan.nextLine());
+      System.out.print("작업명? ");
+      task.setTitle(keyScan.nextLine());  
+      System.out.print("내용? ");
+      task.setContent(keyScan.nextLine());     
+      System.out.print("시작일? ");
+      task.setStartDate(Date.valueOf(keyScan.nextLine()));
+      System.out.print("종료일? ");
+      task.setEndDate(Date.valueOf(keyScan.nextLine()));
 
       if (CommandUtil.confirm(keyScan, "변경하시겠습니까?")) {
-        int count = projectDao.update(project);
+        int count = taskDao.update(task);
         if (count > 0) {
           System.out.println("변경하였습니다.");
         } else {
@@ -116,6 +115,7 @@ public class ProjectController {
         System.out.println("변경을 취소하였습니다.");
       }
     } catch (Exception e) {
+      e.printStackTrace();
       System.out.println("데이터 로딩에 실패했습니다.");
     }
   }

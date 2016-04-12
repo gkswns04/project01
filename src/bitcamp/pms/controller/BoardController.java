@@ -12,7 +12,6 @@ import bitcamp.pms.util.CommandUtil;
 @Controller
 @RequestMapping("board/") // 매핑 정보 일부를 선언한다.
 public class BoardController {
-/*
   private BoardDao boardDao;
 
   public void setBoardDao(BoardDao boardDao) {
@@ -106,8 +105,8 @@ public class BoardController {
       }
       
     } catch (Exception e) {
+      e.printStackTrace();
       System.out.println("데이터 처리에 실패했습니다.");
     }
   }
-*/
 }

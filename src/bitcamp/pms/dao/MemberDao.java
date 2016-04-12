@@ -1,5 +1,6 @@
 package bitcamp.pms.dao;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
@@ -13,11 +14,11 @@ public class MemberDao {
   SqlSessionFactory sqlSessionFactory;
   
   public MemberDao() {}
-  
+ 
   public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
     this.sqlSessionFactory = sqlSessionFactory;
   }
-
+  
   public List<Member> selectList() throws Exception {
     SqlSession sqlSession = sqlSessionFactory.openSession();
     
@@ -37,14 +38,22 @@ public class MemberDao {
       sqlSession.close();
     }
   }
-  
+ 
+  public Member selectOneByEmail(String email) {
+    SqlSession sqlSession = sqlSessionFactory.openSession();
+    
+    try {
+      return sqlSession.selectOne("MemberDao.selectOneByEmail", email);
+    } finally {
+      sqlSession.close();
+    }
+  }
   
   public int insert(Member member) throws Exception {
     SqlSession sqlSession = sqlSessionFactory.openSession(true);
     
     try {
       return sqlSession.insert("MemberDao.insert", member);
-      
     } finally {
       sqlSession.close();
     }
@@ -57,7 +66,6 @@ public class MemberDao {
       int count = sqlSession.update("MemberDao.update", member);
       sqlSession.commit();
       return count;
-      
     } finally {
       sqlSession.close();
     }
@@ -75,5 +83,27 @@ public class MemberDao {
       sqlSession.close();
     }
   }
-}
 
+  public boolean isMember(String email, String password) {
+    SqlSession sqlSession = sqlSessionFactory.openSession();
+    
+    try {
+      HashMap<String,String> paramMap = new HashMap<>();
+      paramMap.put("email", email);
+      paramMap.put("password", password);
+      int count = sqlSession.selectOne("MemberDao.isMember", paramMap);
+      if (count > 0)
+        return true;
+      else
+        return false;  
+      
+    } finally {
+      sqlSession.close();
+    }
+    
+  }
+
+
+  
+
+}
