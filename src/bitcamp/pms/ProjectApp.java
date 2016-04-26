@@ -1,24 +1,49 @@
 /* 목표
-- persistence framework "mybatis" 적용
-- 로그인 기능 추가
-  => req-33.txt 파일 참조 
-  
-- 작업절차
-1) 초기 메뉴 출력 
+- spring framework 적용
 
+[작업]
+1) 스프링 및 마이바티스 의존 라이브러리 추가
+  => build.gradle 파일 변경.
+  => gradle을 실행하여 이클립스 설정 파일을 갱신.
+
+2) 스프링 설정 파일 추가
+  => conf/application-context.xml 파일.
+
+3) 마이바티스 맵퍼 파일 변경
+  => 맵퍼 파일의 넴임스페이스를 인터페이스 이름(패키지명 포함)과 같게 한다.
+  => 마이바티스 설정 파일(conf/mybatis-config.xml)을 제거한다.
+
+4) DAO 클래스를 인터페이스로 변경한다.
+  => BoardDao, MemberDao, ProjectDao
+  => 인터페이스의 메서드 시그너처(메서드 이름과 파라미터, 리턴 타입)는
+     맵퍼 파일의 SQL id, parameterType, resultType과 같아야 한다.
+
+5) 컨트롤러 클래스를 개정한다.
+  => DAO 인터페이스에 선언된 메서드가 변경되었기 때문에 그에 맞추어
+     컨트롤러 클래스의 코드를 변경한다. 
+     => DAO 의존 객체를 주입하려면 @Autowired 애노테이션을 붙여야 한다.
+  => 기존의 @Controller 애노테이션을 스프링 애노테이션으로 교체한다.
+     => import 변경
+  => 기존의 @Controller, @Component 애노테이션을 제거한다.
+     bitcamp.pms.annotation.Component
+     bitcamp.pms.annotation.Controller 
+     
+4) 빈 컨테이너를 스프링 IoC 컨테이너로 교체한다.
+  => 기존의 ApplicationContext를 제거한다.
+     bitcamp.pms.context.ApplicationContext
+  => 기존의 ApplicationContext를 스프링의 ApplicationContext로 바꾼다.
+  => ProjectApp 클래스 변경한다.
 */
 package bitcamp.pms;
 
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import bitcamp.pms.context.ApplicationContext;
 import bitcamp.pms.context.request.RequestHandler;
 import bitcamp.pms.context.request.RequestHandlerMapping;
 import bitcamp.pms.controller.AuthController;
@@ -39,27 +64,15 @@ public class ProjectApp {
   }
   
   public ProjectApp() {
-    appContext = new ApplicationContext("bitcamp.pms");
+    appContext = new ClassPathXmlApplicationContext(
+        "conf/application-context.xml");
     requestHandlerMapping = new RequestHandlerMapping(appContext);
-    appContext.addBean("stdinScan", keyScan);
-    appContext.addBean("session", session);
-    
-    try {
-      InputStream inputStream = Resources.getResourceAsStream(
-          "conf/mybatis-config.xml");
-      appContext.addBean("sqlSessionFactory", 
-          new SqlSessionFactoryBuilder().build(inputStream));
-    } catch (Exception e) {
-      System.out.println("mybatis 준비 중 오류 발생!\n시스템을 종료하겠습니다.");
-      e.printStackTrace();
-      return;
-    }
   }
 
   public void run() {
     AuthController authController = 
         (AuthController)appContext.getBean(AuthController.class);
-    authController.service();
+    authController.service(keyScan, session);
     
     String input;
     do {
@@ -100,7 +113,13 @@ public class ProjectApp {
         
         for (Parameter param : params) {
           //3) 파라미터에 해당하는 객체가 ApplicationContext에 있는지 알아본다.
-          arg = appContext.getBean(param.getType());
+          if (param.getType() == Scanner.class) {
+            arg = keyScan;
+          } else if (param.getType() == Session.class) {
+            arg = session;
+          } else {
+            arg = appContext.getBean(param.getType());
+          }
           
           //4) 찾은 값을 아규먼트 목록에 담는다. 못 찾았으면 null을 담는다.
           args.add(arg);

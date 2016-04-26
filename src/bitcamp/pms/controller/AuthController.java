@@ -1,10 +1,13 @@
 package bitcamp.pms.controller;
 
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import bitcamp.pms.annotation.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
 import bitcamp.pms.annotation.RequestMapping;
 import bitcamp.pms.dao.MemberDao;
 import bitcamp.pms.domain.Member;
@@ -13,36 +16,29 @@ import bitcamp.pms.util.Session;
 
 @Controller
 public class AuthController {
-  Scanner keyScan;
+  @Autowired
   MemberDao memberDao;
+
+  Scanner keyScan;
   Session session;
   
-  public void setSession(Session session) {
-    this.session = session;
-  }
-
-  public void setScanner(Scanner keyScan) {
-    this.keyScan = keyScan;
-  }
-  
-  public void setMemberDao(MemberDao memberDao) {
-    this.memberDao = memberDao;
-  }
-  
   @RequestMapping("unsubscribe")
-  public void unsubscribe(Session se) {   
+  public void unsubscribe(Session se, Scanner keyScan) {
     if (CommandUtil.confirm(keyScan, "정말 탈퇴하시겠습니까?")) {
       try {
         Member loginUser = (Member)se.getAttribute("loginUser");
         memberDao.delete(loginUser.getNo());
         System.out.println("회원 정보를 삭제하였습니다. 안녕히 가세요.");
       } catch (Exception e) {
-        System.out.println("데이터 처리에 실패했습니다.");
+        System.out.println("데이터를 저장하는데 실패했습니다.");
       }
     }
   }
-
-  public void service() {
+  
+  public void service(Scanner keyScan, Session session) {
+    this.keyScan = keyScan;
+    this.session = session;
+    
     String input = null;
     while (true) {
       System.out.println("1) 로그인");
@@ -80,7 +76,7 @@ public class AuthController {
     while (true) {
       System.out.print("이메일: ");
       value = keyScan.nextLine();
-      if (value.matches("[a-zA-Z][\\w\\.]*@([\\w]+\\.)?[\\w]+\\.[a-zA-Z]{2,}"))
+      if (value.matches("[a-zA-Z][\\w\\.]*@([\\w]+\\.)+[a-zA-Z]{2,}"))
         break;
       System.out.println("이메일 형식에 맞지 않습니다. 예) aaa.aaa@bbb.com");
     }
@@ -128,7 +124,7 @@ public class AuthController {
       memberDao.insert(member);
       System.out.println("회원 가입되었습니다.");
     } catch (Exception e) {
-      System.out.println("회원 등록에 실패했습니다.");
+      System.out.println("회원 가입에 실패했습니다.");
     }
   }
 
@@ -139,7 +135,10 @@ public class AuthController {
     System.out.print("암호: ");
     String password = keyScan.nextLine();
     
-    Member member = memberDao.selectOneByEmail(email);
+    HashMap<String,Object> paramMap = new HashMap<>();
+    paramMap.put("email", email);
+    
+    Member member = memberDao.selectOne(paramMap);
     
     if (member == null) {
       System.out.println("등록되지 않은 사용자입니다.");
@@ -150,9 +149,28 @@ public class AuthController {
     }
     
     // 로그인 성공한 회원 정보를 세션에 보관한다.
-    // why? 다른 컨트롤러가 사용할 수 있도록!
+    // why? 다른 컨틀롤러가 사용할 수 있도록!
     session.setAttribute("loginUser", member);
+    
     System.out.printf("환영합니다. %s님!\n", member.getName());
-    return true;  
+    
+    return true;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

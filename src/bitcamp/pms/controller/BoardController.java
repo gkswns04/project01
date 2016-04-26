@@ -3,7 +3,9 @@ package bitcamp.pms.controller;
 import java.util.List;
 import java.util.Scanner;
 
-import bitcamp.pms.annotation.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
 import bitcamp.pms.annotation.RequestMapping;
 import bitcamp.pms.dao.BoardDao;
 import bitcamp.pms.domain.Board;
@@ -12,11 +14,8 @@ import bitcamp.pms.util.CommandUtil;
 @Controller
 @RequestMapping("board/") // 매핑 정보 일부를 선언한다.
 public class BoardController {
+  @Autowired
   private BoardDao boardDao;
-
-  public void setBoardDao(BoardDao boardDao) {
-    this.boardDao = boardDao;
-  }
 
   @RequestMapping("add.do") // 매핑 정보 나머지를 선언한다.
   public void add(Scanner keyScan) {
@@ -105,8 +104,8 @@ public class BoardController {
       }
       
     } catch (Exception e) {
-      e.printStackTrace();
       System.out.println("데이터 처리에 실패했습니다.");
     }
   }
+
 }
